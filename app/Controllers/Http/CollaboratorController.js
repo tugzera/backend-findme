@@ -5,13 +5,17 @@ const User = use('App/Models/User')
 
 class CollaboratorController {
   async index() {
-    const items = await Collaborator.all()
+    const items = await User.query().with('collaborator').fetch()
     return items
   }
 
   async show({ params }) {
     const { id } = params
-    const item = await Collaborator.findOrFail(id)
+    const item = await User.query()
+      .with('collaborator', (builder) => {
+        builder.where('id', id)
+      })
+      .firstOrFail()
     return item
   }
 
@@ -24,8 +28,9 @@ class CollaboratorController {
     const userData = { email, password }
     const user = await User.create(userData)
     const collaboratorData = { user_id: user.id, name }
-    const collaborator = await Collaborator.create(collaboratorData)
-    return collaborator
+    await Collaborator.create(collaboratorData)
+    await user.load('collaborator')
+    return user
   }
 
   async update({ request, params }) {
@@ -36,16 +41,12 @@ class CollaboratorController {
       'name'
     ])
     const userData = { email, password }
-    const user = await User.query()
-      .with('collaborator', (builder) => {
-        builder.where('user_id', id)
-      })
-      .firstOrFail()
+    const collaborator = await Collaborator.findOrFail(id)
+    collaborator.merge({ name })
+    await collaborator.save()
+    const user = await User.findOrFail(collaborator.id)
     user.merge(userData)
     await user.save()
-    const collaborator = await Collaborator.findOrFail(id)
-    collaborator.merge(data)
-    await collaborator.save()
     await user.load('collaborator')
     return user
   }

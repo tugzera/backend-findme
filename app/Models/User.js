@@ -16,8 +16,12 @@ class User extends Model {
     })
   }
 
+  static get hidden() {
+    return ['password']
+  }
+
   collaborator() {
-    return this.belongsTo('App/Models/Collaborator')
+    return this.hasOne('App/Models/Collaborator')
   }
 
   tokens() {

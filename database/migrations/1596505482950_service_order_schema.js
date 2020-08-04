@@ -7,7 +7,7 @@ class ServiceOrderSchema extends Schema {
   up() {
     this.create('service_orders', (table) => {
       table.increments()
-      table.integer('opened_at').notNullable()
+      table.date('opened_at').notNullable()
       table.integer('client_id').unsigned().index()
       table
         .foreign('client_id')
@@ -22,8 +22,8 @@ class ServiceOrderSchema extends Schema {
         .on('collaborators')
         .onUpdate('cascade')
         .onDelete('cascade')
-      table.integer('latitude').notNullable()
-      table.integer('longitude').notNullable()
+      table.decimal('latitude').notNullable()
+      table.decimal('longitude').notNullable()
       table.timestamps()
     })
   }

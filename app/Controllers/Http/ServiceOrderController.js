@@ -21,15 +21,34 @@ class ServiceOrderController {
     return item
   }
 
-  async store({ request }) {
-    const data = request.only(['name'])
+  async store({ request, auth }) {
+    const user = await auth.getUser()
+    const collaborator = await user.collaborator().fetch()
+    const { opened_at, latitude, longitude, client_id } = request.only([
+      'opened_at',
+      'latitude',
+      'longitude',
+      'client_id'
+    ])
+    const data = {
+      collaborator_id: collaborator.id,
+      opened_at,
+      latitude,
+      longitude,
+      client_id
+    }
     const item = await ServiceOrder.create(data)
     return item
   }
 
   async update({ request, params }) {
     const { id } = params
-    const data = request.only(['name'])
+    const data = request.only([
+      'opened_at',
+      'latitude',
+      'longitude',
+      'client_id'
+    ])
     const item = await ServiceOrder.findOrFail(id)
     item.merge(data)
     await item.save()
