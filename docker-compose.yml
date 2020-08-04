@@ -1,0 +1,26 @@
+version: '3'
+
+networks:
+  internal:
+    external: false
+
+services:
+    mysql:
+        image: mysql:5.7
+        container_name: database-mysql
+        environment:
+            - MYSQL_USER=docker
+            - MYSQL_PASSWORD=docker
+            - MYSQL_DATABASE=docker
+            - MYSQL_ROOT_PASSWORD=docker
+        volumes:
+            - ./mysql-db/:/var/lib/mysql
+            - ./my.cnf:/etc/mysql/my.cnf
+        ports:
+            - 3306:3306
+        networks:
+            - jupiter
+
+networks: 
+    jupiter:
+        driver: bridge         
